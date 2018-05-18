@@ -20,7 +20,7 @@ import java.nio.charset.CharsetEncoder;
  */
 public class GB2312UTF8 {
     
-    static OutputStream out = null;
+    static OutputStream out = null;    
     
     public static void main(String[] args) {
         try {
@@ -45,6 +45,9 @@ public class GB2312UTF8 {
         CharBuffer cbuf;
         int count = 0;
         
+        boolean reserved = false;
+        String name = null;
+        
         // Write out the beginning of the html file.
         writeString("<!DOCTYPE html>\n");
         writeString("<html>\n\n");
@@ -55,9 +58,43 @@ public class GB2312UTF8 {
         writeString("\t<h1>GB2312/Unicode/UTF-8 Table</h1>\n");
         
         // GB2312 has 94 rows and 94 cloumns
-        for (int i = 1; i <= 94; i++)
-        {
+        for (int i = 1; i <= 94; i++) {
+            // Define row settings
+            if (i >= 1 && i <= 9) {
+                reserved = false;
+                name = "Graphic symbols";
+            } else if (i >= 10 && i <= 15) {
+                reserved = true;
+                name = "Reserved";
+            }
+            else if (i >= 16 && i <= 55) {
+                reserved = false;
+                name = "Level 1 characters";
+            }
+            else if (i >= 56 && i <= 87) {
+                reserved = false;
+                name = "Level 2 characters";
+            }
+            else if (i >= 88 && i <= 94) {
+                reserved = true;
+                name = "Reserved";
+            }
             
+            // writing row title
+            writeln();
+            writeString("<p>");
+            writeNumber(i);
+            writeString(" Row: " + name);
+            writeln();
+            writeString("</p>");
+            writeln();
+            
+            if (!reserved) {
+                writeln();
+                writeTableHeader();
+                
+                
+            }
         }
         
         // Write out the end of the HTML file
@@ -77,5 +114,14 @@ public class GB2312UTF8 {
     private static void writeln() throws IOException {
         out.write(0x0D);
         out.write(0x0A);
+    }
+
+    private static void writeNumber(int i) throws IOException {
+        String s = "00" + String.valueOf(i);
+        writeString(s.substring(s.length() - 2, s.length()));
+    }
+
+    private static void writeTableHeader() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
